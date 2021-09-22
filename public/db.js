@@ -1,6 +1,7 @@
 let db;
 // VERSION
-let dbVersion = 2;
+let dbVersion = 3;
+const storeName = 'BudgetStore';
 
 const request = indexedDB.open('BudgetDB', dbVersion);
 
@@ -21,7 +22,7 @@ request.onupgradeneeded = function (e) {
 	db = e.target.result;
 
 	if( db.objectStoreNames.length === 0 ) {
-		db.createObjectStore( 'BudgetStore', { autoIncrement: true } );
+		db.createObjectStore( storeName, { autoIncrement: true } );
 	}
 };
 
@@ -36,4 +37,45 @@ request.onsuccess = function (e) {
 
 		checkDatabase();
 	}
+};
+
+// Utility function for making transactions and returning as a store
+function makeStore( sName ) {
+	const transaction = db.transaction( [ sName ], 'readwrite' );
+
+	const store = transaction.objectStore( sName );
+
+	return store;
+}
+
+// Check the Indexed Database
+function checkDatabase() {
+	console.log( 'Checking DB' );
+
+	const store = makeStore( storeName );
+
+	const getAll = store.getAll();
+
+	getAll.onsuccess = function () {
+		if( getAll.result.length > 0 ) {
+			fetch('/api/transaction/bulk', {
+				method: 'POST',
+				body: JSON.stringify(getAll.result),
+				headers: {
+				  Accept: 'application/json, text/plain, */*',
+				  'Content-Type': 'application/json',
+				}
+			})
+			.then((response) => response.json())
+			.then((res) => {
+				if( res.length !== 0 ) {
+					const store = makeStore( storeName );
+
+					store.clear();
+
+					console.log( 'indexedDB Cleared' );
+				}
+			})
+		}
+	};
 };

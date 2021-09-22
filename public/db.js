@@ -79,3 +79,15 @@ function checkDatabase() {
 		}
 	};
 };
+
+// Save an offline record
+const saveRecord = (record) => {
+	console.log( 'Saving offline record' );
+
+	const store = makeStore( storeName );
+
+	store.add( record );
+};
+
+// Listen for back online
+window.addEventListener('online', checkDatabase);

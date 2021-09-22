@@ -4,6 +4,11 @@ let dbVersion = 2;
 
 const request = indexedDB.open('BudgetDB', dbVersion);
 
+// On Error
+request.onerror = function (e) {
+	console.log(`An error occured: ${e.target.errorCode} ${error}`);
+};
+
 // On Upgrade Needed
 request.onupgradeneeded = function (e) {
 	console.log('Upgrading indexedDB');

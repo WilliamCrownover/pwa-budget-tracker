@@ -24,3 +24,16 @@ request.onupgradeneeded = function (e) {
 		db.createObjectStore( 'BudgetStore', { autoIncrement: true } );
 	}
 };
+
+// On Success
+request.onsuccess = function (e) {
+	console.log('Successfully opened indexedDB');
+
+	db = e.target.result;
+
+	if( navigator.onLine ) {
+		console.log( 'Backend online' );
+
+		checkDatabase();
+	}
+};

@@ -1,23 +1,25 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-console */
 let db;
 // VERSION
 let dbVersion = 3;
 const storeName = 'BudgetStore';
 
-const request = indexedDB.open('BudgetDB', dbVersion);
+const request = indexedDB.open( 'BudgetDB', dbVersion );
 
 // On Error
-request.onerror = function (e) {
-	console.log(`An error occured: ${e.target.errorCode} ${error}`);
+request.onerror = function ( e ) {
+	console.log( `An error occured: ${e.target.errorCode}` );
 };
 
 // On Upgrade Needed
-request.onupgradeneeded = function (e) {
-	console.log('Upgrading indexedDB');
+request.onupgradeneeded = function ( e ) {
+	console.log( 'Upgrading indexedDB' );
 
 	const { oldVersion } = e;
 	const newVersion = e.newVersion || db.version;
 
-	console.log( `indexedDB updated from V${oldVersion} to V${newVersion}`);
+	console.log( `indexedDB updated from V${oldVersion} to V${newVersion}` );
 
 	db = e.target.result;
 
@@ -27,8 +29,8 @@ request.onupgradeneeded = function (e) {
 };
 
 // On Success
-request.onsuccess = function (e) {
-	console.log('Successfully opened indexedDB');
+request.onsuccess = function ( e ) {
+	console.log( 'Successfully opened indexedDB' );
 
 	db = e.target.result;
 
@@ -58,30 +60,30 @@ function checkDatabase() {
 
 	getAll.onsuccess = function () {
 		if( getAll.result.length > 0 ) {
-			fetch('/api/transaction/bulk', {
+			fetch( '/api/transaction/bulk', {
 				method: 'POST',
-				body: JSON.stringify(getAll.result),
+				body: JSON.stringify( getAll.result ),
 				headers: {
-				  Accept: 'application/json, text/plain, */*',
-				  'Content-Type': 'application/json',
+					Accept: 'application/json, text/plain, */*',
+					'Content-Type': 'application/json',
 				}
-			})
-			.then((response) => response.json())
-			.then((res) => {
-				if( res.length !== 0 ) {
-					const store = makeStore( storeName );
+			} )
+				.then( ( response ) => response.json() )
+				.then( ( res ) => {
+					if( res.length !== 0 ) {
+						const store = makeStore( storeName );
 
-					store.clear();
+						store.clear();
 
-					console.log( 'indexedDB Cleared' );
-				}
-			})
+						console.log( 'indexedDB Cleared' );
+					}
+				} );
 		}
 	};
-};
+}
 
 // Save an offline record
-const saveRecord = (record) => {
+const saveRecord = ( record ) => {
 	console.log( 'Saving offline record' );
 
 	const store = makeStore( storeName );
@@ -90,4 +92,4 @@ const saveRecord = (record) => {
 };
 
 // Listen for back online
-window.addEventListener('online', checkDatabase);
+window.addEventListener( 'online', checkDatabase );
